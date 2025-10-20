@@ -4,14 +4,14 @@ from fastapi import FastAPI, HTTPException, status
     #HTTPException to trigger HTTP errors like 404,401,403,etc
     #Depends for middlewate inyectable dependencies
     #status for legible HTTP status codes
-#from fastapi.security import HTTPBearer, HTTPAuthorizationCredentials
+from fastapi.security import HTTPBearer, HTTPAuthorizationCredentials
     #HTTPBearer for bearer tokens
     # HTTPAuthorizationCredentials to extract the credentials from the header 
 from pydantic import BaseModel
     #pydantic BaseModel for model data validation.
 from typing import Optional
     #importing Optional to be able to use None as a datatype
-#from jose import JWTError, jwt
+from jose import JWTError, jwt
     #models for catching JWT errors
 from datetime import datetime
 #from datetime import datetime, timedelta
@@ -25,10 +25,45 @@ app = FastAPI(
 
 #security = HTTPBearer()
     # created a security bearer schema.
+
+#Basic Model for HelloResponse Primarly for testing
 class HelloResponse(BaseModel):
     message: str
     timestamp: str
     success: bool
+
+#Model for token request
+class TokenRequest(BaseModel):
+    pass
+
+#Model for token response
+class TokenResponse(BaseModel):
+    access_token: str
+    token_type: str
+    expires_in: int
+
+#Model for user validation
+class UserValidationRequest(BaseModel):
+    userId: Optional[str] = None
+    email: Optional[str] = None
+
+#Model for user Info format
+class UserInfo(BaseModel):
+    userID: str
+    email: str
+    status: str
+    isValid: bool
+
+#Model for user data validation
+class ValidationData(BaseModel):
+    user: UserInfo
+    validation: dict
+
+#Model for the response to the user validation
+class UserValidationResponse(BaseModel):
+    success: bool
+    code: int
+    data: ValidationData
 
 
 @app.get("/helloWorld")
