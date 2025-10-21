@@ -10,7 +10,7 @@ from pydantic import BaseModel
     #pydantic BaseModel for model data validation.
 from src.iolayer.validators import validate_txt_file
 from src.service.analyze import analyze_from_upload
-from src.schemas.responses import AnalysisSuccess, AnalysisError
+from src.schemas.responses import AnalysisSuccess, AnalysisError, UserValidationRequest, TokenRequest, HelloResponse, Metrics
 from src.utils.errors import DecodeError, FormatError, UnknownLevel, ValidationError, IOErrorApp, AppBaseError
 from typing import Optional
     #importing Optional to be able to use None as a datatype
@@ -55,25 +55,6 @@ VALID_CREDENTIALS = {
     "client_2": "secret_456"
 }
 TOKEN_DURATION = 600  # segundos para demo rápida
-
-###MODELS###
-
-#using None as a datatype so the user doesnt have to input both userID and email
-class UserValidationRequest(BaseModel):
-    userId: Optional[str] = None
-    email: Optional[str] = None
-
-#defines the body to generate tokens
-class TokenRequest(BaseModel):
-    client_id: str
-    client_secret: str
-
-#Basic Model for HelloResponse Primarly for testing
-class HelloResponse(BaseModel):
-    message: str
-    timestamp: str
-    success: bool
-
 
 @app.get("/helloWorld")
 def hello_world():
@@ -352,17 +333,21 @@ def analyze_file(request: Request, file: UploadFile = File(...)):
     """
     try:
         validate_txt_file(file)  # extensión/MIME/tamaño
-        result, metrics, report_path = analyze_from_upload(file)
+        result, metrics, report_path, png_path  = analyze_from_upload(file)
 
         # Construir URL pública del reporte HTML (sirviéndose desde /reports)
         rel_report = report_path.relative_to(REPORTS_BASE)
         report_url_html = str(request.url_for("reports", path=rel_report.as_posix()))
+
+        rel_severity_png = png_path.relative_to(REPORTS_BASE)
+        chart_url_png = str(request.url_for("reports", path=rel_severity_png.as_posix()))
 
         payload = AnalysisSuccess(
             source_filename=file.filename or "unknown.txt",
             result=result,
             metrics=metrics,
             report_url_html=report_url_html,
+            chart_url_png=chart_url_png,
         )
         return payload
 

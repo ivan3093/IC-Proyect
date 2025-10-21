@@ -34,6 +34,7 @@ def analyze_from_upload(file: UploadFile) -> Tuple[Dict[str, List[str]], dict, P
             except UnicodeDecodeError as e:
                 # mapear explícitamente a DecodeError
                 raise DecodeError(f"UTF-8 decoding failed at byte offset. {e}") from e
+    
     except DecodeError:
         # NO envolver en IOErrorApp: dejar que suba y el endpoint lo mapee a 415
         raise
@@ -63,4 +64,4 @@ def analyze_from_upload(file: UploadFile) -> Tuple[Dict[str, List[str]], dict, P
         #template_path=Path("templates") / "report.html.j2",
         template_path=TEMPLATE_FILE,  # <-- absoluto
     )
-    return result, metrics, report_path
+    return result, metrics, report_path ,png_path

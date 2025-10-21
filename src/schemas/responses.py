@@ -2,6 +2,25 @@ from pydantic import BaseModel
 from typing import Dict, List, Optional
 
 
+###MODELS###
+
+#using None as a datatype so the user doesnt have to input both userID and email
+class UserValidationRequest(BaseModel):
+    userId: Optional[str] = None
+    email: Optional[str] = None
+
+#defines the body to generate tokens
+class TokenRequest(BaseModel):
+    client_id: str
+    client_secret: str
+
+#Basic Model for HelloResponse Primarly for testing
+class HelloResponse(BaseModel):
+    message: str
+    timestamp: str
+    success: bool
+
+
 class Metrics(BaseModel):
     counts: Dict[str, int]
     percent: Dict[str, float]
@@ -14,6 +33,7 @@ class AnalysisSuccess(BaseModel):
     result: Dict[str, List[str]]
     metrics: Metrics
     report_url_html: str
+    chart_url_png: str # <--- nuevo
 
 
 class AnalysisError(BaseModel):
@@ -23,3 +43,5 @@ class AnalysisError(BaseModel):
     failed_line_content: Optional[str] = None
     last_success_line_number: Optional[int] = None
     last_success_line_content: Optional[str] = None
+
+

@@ -8,3 +8,12 @@ __pycache__/
 static/reports/*
 !static/reports/.gitkeep
 static/
+__pycache__/*
+src/service/__pycache__/*
+src/schemas/__pycache__/*
+app/__pycache__/*
+tests/__pycache__/*
+src/core/__pycache__/*
+src/iolayer/__pycache__/*
+src/report/__pycache__/*
+src/utils/__pycache__/*
