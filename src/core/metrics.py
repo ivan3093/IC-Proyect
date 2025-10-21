@@ -49,3 +49,22 @@ def build_metrics(result: Dict[str, List[str]], invalid_count: int = 0, duration
         "top": top,
         "duration_ms": duration_ms,
     }
+
+def build_samples(result: Dict[str, List[str]], n: int = 3) -> Dict[str, Dict[str, List[str]]]:
+    """
+    Devuelve, por severidad, las primeras y últimas N líneas.
+    Estructura:
+    {
+      "ERROR":   {"first": [...], "last": [...]},
+      "WARNING": {"first": [...], "last": [...]},
+      "INFO":    {"first": [...], "last": [...]}
+    }
+    """
+    out: Dict[str, Dict[str, List[str]]] = {}
+    for level in ("ERROR", "WARNING", "INFO"):
+        lines = result.get(level, [])
+        out[level] = {
+            "first": lines[:n],
+            "last":  lines[-n:] if len(lines) >= n else lines[:],
+        }
+    return out

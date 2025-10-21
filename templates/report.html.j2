@@ -32,3 +32,32 @@
     {% endif %}
   </table>
 </section>
+
+<section>
+  <h2>Muestras por severidad</h2>
+
+  {% for level in ["ERROR", "WARNING", "INFO"] %}
+  <h3>{{ level }}</h3>
+  <div class="grid">
+    <section>
+      <h4>Primeras {{ samples[level]["first"] | length }}</h4>
+      <table>
+        <tr><th>#</th><th>Línea</th></tr>
+        {% for i, line in enumerate(samples[level]["first"]) %}
+        <tr><td>{{ i+1 }}</td><td><code>{{ line }}</code></td></tr>
+        {% endfor %}
+      </table>
+    </section>
+    <section>
+      <h4>Últimas {{ samples[level]["last"] | length }}</h4>
+      <table>
+        <tr><th>#</th><th>Línea</th></tr>
+        {% for i, line in enumerate(samples[level]["last"]) %}
+        <tr><td>{{ i+1 }}</td><td><code>{{ line }}</code></td></tr>
+        {% endfor %}
+      </table>
+    </section>
+  </div>
+  {% endfor %}
+</section>
+

@@ -11,5 +11,5 @@ if str(SRC) not in sys.path:
 
 # Ignorar tests específicos hasta que integres esos módulos
 collect_ignore = [
-    "tests/test_report_builder.py",
+    #"tests/test_report_builder.py",
 ]
