@@ -26,7 +26,7 @@ import os
 app = FastAPI(
      title="FastAPI server",
     description="Mock server for testing authentication and user validation and log analizing",
-    version="2.0.2"
+    version="2.0.3"
 )
 
 # Montar carpeta de artefactos estáticos (reportes HTML/PNGs)
