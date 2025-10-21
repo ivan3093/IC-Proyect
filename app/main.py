@@ -8,8 +8,8 @@ from fastapi.staticfiles import StaticFiles
 from pathlib import Path
 from pydantic import BaseModel
     #pydantic BaseModel for model data validation.
-from src.io.validators import validate_txt_file
-#from src.service.analyze import analyze_from_upload
+from src.iolayer.validators import validate_txt_file
+from src.service.analyze import analyze_from_upload
 from src.schemas.responses import AnalysisSuccess, AnalysisError
 from src.utils.errors import (AppBaseError,DecodeError,IOErrorApp,FormatError,UnknownLevel,ValidationError,)
 from typing import Optional
@@ -26,7 +26,7 @@ import os
 app = FastAPI(
      title="FastAPI server",
     description="Mock server for testing authentication and user validation and log analizing",
-    version="2.0.3"
+    version="2.0.4"
 )
 
 # Montar carpeta de artefactos estáticos (reportes HTML/PNGs)
