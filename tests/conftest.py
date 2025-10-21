@@ -1,6 +1,69 @@
 # tests/conftest.py
+import io
 import os
 import pytest
+from starlette.datastructures import UploadFile
+
+# --- AUTOUSE: cambiar CWD a tmp por prueba ---
+@pytest.fixture(autouse=True)
+def cwd_tmp(tmp_path):
+    """
+    Aísla el CWD en un tmp por prueba, para que 'static/reports' no ensucie el repo.
+    Si ya tuvieras otra fixture 'cwd_tmp' en root, NO dupliques esta.
+    """
+    old = os.getcwd()
+    os.chdir(tmp_path)
+    try:
+        yield
+    finally:
+        os.chdir(old)
+
+
+@pytest.fixture
+def sample_ok_lines():
+    return [
+        "[INFO] Server started successfully\n",
+        "[WARNING] Low available memory\n",
+        "[ERROR] Database connection failed\n",
+        "   [error]   Timeout while connecting to API   \n",
+        "[INFO] Authenticated user\n",
+        "[ERROR] File not found: config.yaml\n",
+        "[ERROR] Database connection failed\n",
+    ]
+
+@pytest.fixture
+def sample_invalid_line():
+    return ["[INFO] ok\n", "this is not valid\n", "[ERROR] never reached\n"]
+
+@pytest.fixture
+def sample_unknown_level():
+    return ["[INFO] ok\n", "[ALERT] something\n"]
+
+# --- Helper UploadFile tolerante al content_type ---
+def _uf(name: str, data: bytes = b"x", content_type: str = "text/plain"):
+    uf = UploadFile(filename=name, file=io.BytesIO(data))
+    try:
+        uf.content_type = content_type  # en tu versión esto no se pasa por __init__
+    except Exception:
+        pass
+    return uf
+
+# --- Fixtures de UploadFile para service/analyze ---
+@pytest.fixture
+def upload_txt_ok():
+    return _uf("server_logs.txt", b"[INFO] ok\n[WARNING] w\n[ERROR] e\n")
+
+@pytest.fixture
+def upload_txt_invalid():
+    return _uf("server_logs.txt", b"[INFO] ok\nbroken_line\n")
+
+@pytest.fixture
+def upload_txt_unknown():
+    return _uf("server_logs.txt", b"[INFO] ok\n[ALERT] z\n")
+
+@pytest.fixture
+def upload_txt_non_utf8():
+    return _uf("server_logs.txt", b"\xff\xfe\xfa")
 
 @pytest.fixture
 def tmp_template_dir(tmp_path):
@@ -91,15 +154,4 @@ def tmp_template_dir(tmp_path):
     )
     return tpl_dir
 
-@pytest.fixture(autouse=True)
-def cwd_tmp(tmp_path):
-    """
-    Aísla el CWD en un tmp por prueba, para que 'static/reports' no ensucie el repo.
-    Si ya tuvieras otra fixture 'cwd_tmp' en root, NO dupliques esta.
-    """
-    old = os.getcwd()
-    os.chdir(tmp_path)
-    try:
-        yield
-    finally:
-        os.chdir(old)
+

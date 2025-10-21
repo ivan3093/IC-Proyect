@@ -3,8 +3,10 @@ from typing import Iterable, Dict, List, Tuple, Optional
 from src.utils.errors import FormatError, UnknownLevel
 
 #PATTERN = r"^\s*\[(?i:INFO|WARNING|ERROR)\]\s*(.+?)\s*$"
-PATTERN = r"^\s*\[(INFO|WARNING|ERROR)\]\s*(.+?)\s*$"
-REGEX = re.compile(PATTERN, re.IGNORECASE)
+#PATTERN = r"^\s*\[(INFO|WARNING|ERROR)\]\s*(.+?)\s*$"
+#REGEX = re.compile(PATTERN, re.IGNORECASE)
+REGEX = re.compile(r'^\s*\[(?P<level>[A-Za-z]+)\]\s*(?P<msg>.*?)\s*$', re.IGNORECASE)
+
 
 
 ALLOWED_LEVELS = {"INFO", "WARNING", "ERROR"}
@@ -23,14 +25,22 @@ def parse_line(line: str, line_no: int) -> Tuple[str, str]:
     """
     m = REGEX.match(line)
     if not m:
+            # Formato incorrecto (ni siquiera corchetes/estructura)
         raise FormatError(line_no=line_no, line=line, last_ok_no=None, last_ok_line=None)
 
-    level_raw, message = m.group(1), m.group(2)
+    #level_raw, message = m.group(1), m.group(2)
+    level_raw = m.group("level")
+    msg = m.group("msg")
     level = level_raw.upper() #Normalizes text to ALL CAPS  for level
-    if level not in ALLOWED_LEVELS:
-        raise UnknownLevel(line_no=line_no, line=line, last_ok_no=None, last_ok_line=None)
 
-    return level, message
+
+    if level not in ALLOWED_LEVELS:
+        # Estructura correcta, pero nivel NO permitido
+        #raise UnknownLevel(line_no=line_no, line=line, last_ok_no=None, last_ok_line=None)
+        err = UnknownLevel(line_no=line_no, line=line, last_ok_no=None, last_ok_line=None)
+        raise err
+
+    return level, msg
 
 
 def log_analyzer(lines: Iterable[str]) -> Dict[str, List[str]]:

@@ -22,6 +22,7 @@ def build_report_html(
         loader=FileSystemLoader(str(template_path.parent)),
         autoescape=select_autoescape(["html", "xml"]),
     )
+    env.globals["enumerate"] = enumerate
     template = env.get_template(template_path.name)
 
     html = template.render(

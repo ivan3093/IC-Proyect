@@ -1,4 +1,4 @@
-from fastapi import FastAPI, HTTPException, status, Header, UploadFile, File
+from fastapi import FastAPI, HTTPException, status, Header, UploadFile, File, Request
     #FastAPI is the principal applciation class
     #HTTPException to trigger HTTP errors like 404,401,403,etc
     #for automatic header extraction
@@ -11,7 +11,7 @@ from pydantic import BaseModel
 from src.iolayer.validators import validate_txt_file
 from src.service.analyze import analyze_from_upload
 from src.schemas.responses import AnalysisSuccess, AnalysisError
-from src.utils.errors import (AppBaseError,DecodeError,IOErrorApp,FormatError,UnknownLevel,ValidationError,)
+from src.utils.errors import DecodeError, FormatError, UnknownLevel, ValidationError, IOErrorApp, AppBaseError
 from typing import Optional
     #importing Optional to be able to use None as a datatype
 from datetime import datetime, timedelta
@@ -26,7 +26,7 @@ import os
 app = FastAPI(
      title="FastAPI server",
     description="Mock server for testing authentication and user validation and log analizing",
-    version="2.0.5"
+    version="2.0.61"
 )
 
 # Montar carpeta de artefactos estáticos (reportes HTML/PNGs)
@@ -34,6 +34,10 @@ STATIC_BASE = Path("static")
 REPORTS_BASE = STATIC_BASE / "reports"
 REPORTS_BASE.mkdir(parents=True, exist_ok=True)
 app.mount("/reports", StaticFiles(directory=str(REPORTS_BASE)), name="reports")
+
+# Antes (mal): PROJECT_ROOT = Path(__file__).resolve().parents[2]
+PROJECT_ROOT = Path(__file__).resolve().parents[1]  # <- apuntar a .../IncodeChallenge
+TEMPLATE_PATH = PROJECT_ROOT / "templates" / "report.html.j2"
 
 #directories to simulate memory status
 valid_tokens = {}
@@ -69,6 +73,7 @@ class HelloResponse(BaseModel):
     message: str
     timestamp: str
     success: bool
+
 
 @app.get("/helloWorld")
 def hello_world():
@@ -340,7 +345,7 @@ async def validate_user(
         422: {"model": AnalysisError},
     },
 )
-def analyze_file(file: UploadFile = File(...)):
+def analyze_file(request: Request, file: UploadFile = File(...)):
     """
     Endpoint principal. Recibe un .txt vía multipart/form-data (campo 'file').
     Orquesta validación -> análisis -> reporte, devolviendo JSON + link a HTML.
@@ -351,7 +356,7 @@ def analyze_file(file: UploadFile = File(...)):
 
         # Construir URL pública del reporte HTML (sirviéndose desde /reports)
         rel_report = report_path.relative_to(REPORTS_BASE)
-        report_url_html = f"/reports/{rel_report.as_posix()}"
+        report_url_html = str(request.url_for("reports", path=rel_report.as_posix()))
 
         payload = AnalysisSuccess(
             source_filename=file.filename or "unknown.txt",
@@ -363,57 +368,108 @@ def analyze_file(file: UploadFile = File(...)):
 
     except ValidationError as e:
         raise HTTPException(
-            status_code=400,
-            detail=AnalysisError(
-                error_type="ValidationError",
-                message=str(e),
-            ).model_dump()
+            status_code=status.HTTP_400_BAD_REQUEST,
+            detail={
+                "error_type": "ValidationError",
+                "message": str(e)
+                }
         )
+
     except DecodeError as e:
-        raise HTTPException(
-            status_code=415,
-            detail=AnalysisError(
-                error_type="DecodeError",
-                message=str(e),
-            ).model_dump()
+       raise HTTPException(
+            status_code=status.HTTP_415_UNSUPPORTED_MEDIA_TYPE,
+            detail={
+                "error_type": "DecodeError",
+                "message": str(e),
+            }
         )
-    except (FormatError, UnknownLevel) as e:
+    except UnknownLevel as e:
+        raise HTTPException(
+            status_code=status.HTTP_422_UNPROCESSABLE_ENTITY,
+            detail={
+                "error_type": "UnknownLevel",
+                "message": str(e),
+                "failed_line_number": getattr(e, "failed_line_number", None),
+                "failed_line_content": getattr(e, "failed_line_content", None),
+                "last_success_line_number": getattr(e, "last_success_line_number", None),
+                "last_success_line_content": getattr(e, "last_success_line_content", None),
+            }
+    )
+
+    except FormatError as e:
         # e debe traer contexto de línea fallida y última OK
         raise HTTPException(
-            status_code=422,
-            detail=AnalysisError(
-                error_type=e.__class__.__name__,
-                message=str(e),
-                failed_line_number=getattr(e, "failed_line_number", None),
-                failed_line_content=getattr(e, "failed_line_content", None),
-                last_success_line_number=getattr(e, "last_success_line_number", None),
-                last_success_line_content=getattr(e, "last_success_line_content", None),
-            ).model_dump()
+            status_code=status.HTTP_422_UNPROCESSABLE_ENTITY,
+            detail={
+                "error_type": "FormatError",
+                "message": str(e),
+                "failed_line_number": getattr(e, "failed_line_number", None),
+                "failed_line_content": getattr(e, "failed_line_content", None),
+                "last_success_line_number": getattr(e, "last_success_line_number", None),
+                "last_success_line_content": getattr(e, "last_success_line_content", None),
+            }
         )
     except IOErrorApp as e:
         raise HTTPException(
-            status_code=400,
-            detail=AnalysisError(
-                error_type="IOError",
-                message=str(e),
-            ).model_dump()
+            #status_code=400,
+            status_code=status.HTTP_400_BAD_REQUEST,
+            detail={
+                "error_type": "IOError",
+                "message": str(e)
+            }
         )
     except AppBaseError as e:
         # Salvaguarda para errores de app no clasificados
         raise HTTPException(
-            status_code=400,
-            detail=AnalysisError(
-                error_type="AppError",
-                message=str(e),
-            ).model_dump()
+            status_code=status.HTTP_400_BAD_REQUEST,
+            detail={
+                "error_type": "AppError",
+                "message": str(e)
+            }
         )
     except Exception as e:
         # Fallback genérico (no exponer stacktrace)
         raise HTTPException(
-            status_code=500,
-            detail=AnalysisError(
-                error_type="InternalServerError",
-                message="Unexpected error. Please try again later.",
-            ).model_dump()
+            status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
+            detail={
+                "error_type": "InternalServerError",
+                "message": "Unexpected error. Please try again later."
+            }
         )
 
+
+@app.on_event("startup")
+def preflight_checks() -> None:
+    # 1) Dependencias críticas
+    try:
+        import matplotlib  # noqa: F401
+    except Exception as e:
+        # Si falta, detener la app inmediatamente
+        raise RuntimeError(
+            "Dependency check failed: 'matplotlib' is not available. "
+            "Install requirements.txt in the active venv."
+        ) from e
+
+    # 2) Plantilla Jinja2 presente
+    if not TEMPLATE_PATH.exists():
+        raise RuntimeError(
+            f"Missing report template: {TEMPLATE_PATH}. "
+            "Ensure templates/report.html.j2 exists."
+        )
+
+    # 3) Directorio de reportes escribible
+    REPORTS_BASE.mkdir(parents=True, exist_ok=True)
+    test_file = REPORTS_BASE / ".write_test"
+    try:
+        test_file.write_text("ok", encoding="utf-8")
+        test_file.unlink(missing_ok=True)
+    except Exception as e:
+        raise RuntimeError(
+            f"Reports directory not writable: {REPORTS_BASE}. Check permissions."
+        ) from e
+
+
+@app.get("/health")
+def health():
+    # Healthcheck simple para monitoreo
+    return {"status": "ok", "reports_dir": str(REPORTS_BASE), "template": str(TEMPLATE_PATH)}
