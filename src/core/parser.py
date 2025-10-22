@@ -14,9 +14,9 @@ ALLOWED_LEVELS = {"INFO", "WARNING", "ERROR"}
 
 def parse_line(line: str, line_no: int) -> Tuple[str, str]:
     """
-    Parsea una línea con formato: [LEVEL] Mensaje
-    - Acepta minúsculas y espacios extra.
-    - Normaliza LEVEL a MAYÚSCULAS.
+    Parse a line with the format: [LEVEL] Message
+    - Accepts lowercase and extra spaces.
+    - Normalizes LEVEL to UPPERCASE.
     Returns:
         (level_upper, message_stripped)
     Raises:
@@ -25,7 +25,7 @@ def parse_line(line: str, line_no: int) -> Tuple[str, str]:
     """
     m = REGEX.match(line)
     if not m:
-            # Formato incorrecto (ni siquiera corchetes/estructura)
+            # Incorrect format (missing brackets/structure)
         raise FormatError(line_no=line_no, line=line, last_ok_no=None, last_ok_line=None)
 
     #level_raw, message = m.group(1), m.group(2)
@@ -35,7 +35,7 @@ def parse_line(line: str, line_no: int) -> Tuple[str, str]:
 
 
     if level not in ALLOWED_LEVELS:
-        # Estructura correcta, pero nivel NO permitido
+        # Correct structure, but disallowed level
         #raise UnknownLevel(line_no=line_no, line=line, last_ok_no=None, last_ok_line=None)
         err = UnknownLevel(line_no=line_no, line=line, last_ok_no=None, last_ok_line=None)
         raise err
@@ -45,7 +45,7 @@ def parse_line(line: str, line_no: int) -> Tuple[str, str]:
 
 def log_analyzer(lines: Iterable[str]) -> Dict[str, List[str]]:
     """
-    Itera línea a línea (streaming) y clasifica:
+    Iterate line by line (streaming) and classify:
     Returns:
         {'ERROR': [...], 'WARNING': [...], 'INFO': [...]}
     Fail-fast:
@@ -63,7 +63,7 @@ def log_analyzer(lines: Iterable[str]) -> Dict[str, List[str]]:
             result[level].append(f"[{level}] {msg}")
             last_ok_no, last_ok_line = idx, f"[{level}] {msg}"
         except FormatError as e:
-            # Enriquecer con última OK
+            # Enrich with last successful line
             e.last_success_line_number = last_ok_no
             e.last_success_line_content = last_ok_line
             raise
