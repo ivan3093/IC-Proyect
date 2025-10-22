@@ -328,9 +328,10 @@ async def validate_user(
 )
 def analyze_file(request: Request, file: UploadFile = File(...)):
     """
-    Endpoint principal. Recibe un .txt vía multipart/form-data (campo 'file').
-    Orquesta validación -> análisis -> reporte, devolviendo JSON + link a HTML.
+    Main endpoint. Receives a .txt via multipart/form-data (field 'file').
+    Orchestrates validation -> analysis -> reporting, returning JSON + a link to the HTML report.
     """
+
     try:
         validate_txt_file(file)  # extensión/MIME/tamaño
         result, metrics, report_path, png_path  = analyze_from_upload(file)
