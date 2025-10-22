@@ -19,9 +19,9 @@ def build_bar_chart_png(counts: Dict[str, int], out_dir: Path, filename: str = "
         # Gráfica simple
         fig, ax = plt.subplots()
         ax.bar(labels, values)
-        ax.set_title("Logs por severidad")
-        ax.set_ylabel("Conteo")
-        ax.set_xlabel("Severidad")
+        ax.set_title("Logs by severity")
+        ax.set_ylabel("Count")
+        ax.set_xlabel("Severity")
         fig.tight_layout()
         fig.savefig(path)
         plt.close(fig)

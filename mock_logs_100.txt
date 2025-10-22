@@ -1,0 +1,100 @@
+[WARNING] Low available memory
+[ERROR] Permission denied reading secret
+[INFO] Authenticated user
+[WARNING] Cache miss rate elevated
+[INFO] Connection established
+[INFO] Authenticated user
+[INFO] Request processed
+[WARNING] Cache miss rate elevated
+[INFO] Request processed
+[INFO] Heartbeat OK
+[WARNING] Low available memory
+[ERROR] File not found: config.yaml
+[WARNING] Deprecated API used
+[INFO] Cache warmed
+[ERROR] OutOfMemoryError in process
+[INFO] Connection established
+[INFO] Configuration loaded
+[WARNING] Low available memory
+[ERROR] TLS handshake failed
+[INFO] Connection established
+[INFO] Scheduled task completed
+[ERROR] Message queue publish failed
+[ERROR] OutOfMemoryError in process
+[WARNING] High CPU usage detected
+[INFO] Cache warmed
+[ERROR] Timeout while connecting to API
+[ERROR] Timeout while connecting to API
+[INFO] Heartbeat OK
+[WARNING] Deprecated API used
+[INFO] Configuration loaded
+[INFO] Scheduled task completed
+[ERROR] Timeout while connecting to API
+[WARNING] Slow query detected
+[WARNING] Disk space nearing capacity
+[INFO] Connection established
+[INFO] Request processed
+[INFO] Configuration loaded
+[ERROR] Database connection failed
+[INFO] Server started successfully
+[ERROR] Deadlock detected on resource
+[INFO] Cache warmed
+[ERROR] Message queue publish failed
+[ERROR] OutOfMemoryError in process
+[INFO] Heartbeat OK
+[INFO] Heartbeat OK
+[INFO] Health check passed
+[INFO] Request processed
+[WARNING] File descriptor usage high
+[INFO] Session created
+[INFO] Cache warmed
+[ERROR] File not found: config.yaml
+[WARNING] High CPU usage detected
+[ERROR] Timeout while connecting to API
+[INFO] Health check passed
+[ERROR] Deadlock detected on resource
+[WARNING] Clock skew detected
+[INFO] Heartbeat OK
+[WARNING] Cache miss rate elevated
+[ERROR] Database connection failed
+[WARNING] High CPU usage detected
+[WARNING] Cache miss rate elevated
+[ERROR] OutOfMemoryError in process
+[INFO] Connection established
+[INFO] Server started successfully
+[ERROR] Unhandled exception in worker
+[ERROR] File not found: config.yaml
+[WARNING] High CPU usage detected
+[ERROR] Unhandled exception in worker
+[ERROR] TLS handshake failed
+[WARNING] Slow query detected
+[INFO] Health check passed
+[WARNING] Cache miss rate elevated
+[ERROR] Message queue publish failed
+[INFO] Server started successfully
+[INFO] Configuration loaded
+[ERROR] Unhandled exception in worker
+[INFO] Cache warmed
+[ERROR] Timeout while connecting to API
+[INFO] Heartbeat OK
+[ERROR] TLS handshake failed
+[ERROR] File not found: config.yaml
+[WARNING] Cache miss rate elevated
+[INFO] Request processed
+[ERROR] Deadlock detected on resource
+[ERROR] TLS handshake failed
+[ERROR] Permission denied reading secret
+[ERROR] Deadlock detected on resource
+[ERROR] OutOfMemoryError in process
+[INFO] Request processed
+[WARNING] Disk space nearing capacity
+[INFO] Configuration loaded
+[INFO] Request processed
+[INFO] Cache warmed
+[INFO] Server started successfully
+[INFO] Server started successfully
+[ERROR] Timeout while connecting to API
+[WARNING] Retrying upstream request
+[WARNING] Disk space nearing capacity
+[WARNING] File descriptor usage high
+[WARNING] Disk space nearing capacity
