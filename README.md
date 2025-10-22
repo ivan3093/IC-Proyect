@@ -98,26 +98,26 @@ PROYECT LAYOUT
 
     app/
         main.py                # FastAPI endpoint + static mount + error mapping
-     src
-     core/
-        parser.py            # regex-based parse_line + log_analyzer(streaming)
-        metrics.py           # counts, percents, top repeated (+ samples helper)
-    service/
-        analyze.py           # orchestrates: decode -> core -> metrics -> artifacts
-    report/
-        charts.py            # bar chart PNG (severity)  [MVP or next]
-        builder.py           # Jinja2 HTML report
-    io/
-        validators.py        # .txt extension, MIME checks
-    utils/
-        errors.py            # DecodeError, FormatError, UnknownLevel, etc.
-        files.py             # artifacts dir /static/reports/<uuid>/
-    schemas/
-        responses.py         # Pydantic models for API responses
+    src/
+        core/
+            parser.py            # regex-based parse_line + log_analyzer(streaming)
+            metrics.py           # counts, percents, top repeated (+ samples helper)
+        service/
+            analyze.py           # orchestrates: decode -> core -> metrics -> artifacts
+        report/
+            charts.py            # bar chart PNG (severity)  [MVP or next]
+            builder.py           # Jinja2 HTML report
+        io/
+            validators.py        # .txt extension, MIME checks
+        utils/
+            errors.py            # DecodeError, FormatError, UnknownLevel, etc.
+            files.py             # artifacts dir /static/reports/<uuid>/
+        schemas/
+            responses.py         # Pydantic models for API responses
     templates/
     report.html.j2         # HTML template
     static/
-    reports/               # generated artifacts (mounted at /reports)
+        reports/               # generated artifacts (mounted at /reports)
     tests/
     ...                    # pytest suite (unit + integration)
     
