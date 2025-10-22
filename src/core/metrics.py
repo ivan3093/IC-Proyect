@@ -3,8 +3,8 @@ from collections import Counter
 
 def top_repeated(messages: List[str], n: int = 3) -> List[Tuple[str, int]]:
     """
-    Retorna una lista con los `n` mensajes más repetidos y sus conteos.
-    Retorna lista vacía si no hay mensajes.
+    Returns a list with the top `n` most repeated messages and their counts.
+    Returns an empty list if there are no messages.
     """
     if not messages:
         return []
@@ -13,7 +13,7 @@ def top_repeated(messages: List[str], n: int = 3) -> List[Tuple[str, int]]:
 
 def build_metrics(result: Dict[str, List[str]], invalid_count: int = 0, duration_ms: int = 0) -> Dict:
     """
-    Calcula conteos, % relativos y tops (ERROR/WARNING).
+    Computes counts, relative percentages, and tops (ERROR/WARNING).
     Returns:
         {
           'counts': {'ERROR': int, 'WARNING': int, 'INFO': int, 'INVALID': int},
@@ -33,11 +33,11 @@ def build_metrics(result: Dict[str, List[str]], invalid_count: int = 0, duration
     }
     counts["INVALID"] = invalid_count
 
-    # Obtener top 3 para ERROR y WARNING
+    # Get top 3 for ERROR and WARNING
     top_err = top_repeated(result.get("ERROR", []))
     top_warn = top_repeated(result.get("WARNING", []))
 
-    # Convertir a lista de diccionarios o None si está vacío
+    # Convert to list of dicts or None if empty
     top = {
         "ERROR": [{"message": msg, "count": count} for msg, count in top_err] if top_err else None,
         "WARNING": [{"message": msg, "count": count} for msg, count in top_warn] if top_warn else None,
@@ -52,7 +52,7 @@ def build_metrics(result: Dict[str, List[str]], invalid_count: int = 0, duration
 
 def build_samples(result: Dict[str, List[str]], n: int = 3) -> Dict[str, Dict[str, List[str]]]:
     """
-    Devuelve, por severidad, las primeras y últimas N líneas.
+    Returns, per severity, the first and last N lines.
     Estructura:
     {
       "ERROR":   {"first": [...], "last": [...]},
