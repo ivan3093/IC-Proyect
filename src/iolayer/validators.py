@@ -5,40 +5,41 @@ from src.utils.errors import ValidationError
 
 ALLOWED_EXT = {".txt", ".TXT"}
 ALLOWED_MIME = {"text/plain", "application/octet-stream"}
-MAX_BYTES = 10 * 1024 * 1024  # 10 MB (ajustable)
+MAX_BYTES = 10 * 1024 * 1024  # 10 MB (adjustable)
 
 
 def validate_txt_file(file: UploadFile, max_bytes: int = MAX_BYTES) -> None:
     """
-    Valida extensión .txt/.TXT, MIME permitido y tamaño (cuando esté disponible).
-    Lanza ValidationError si algo no cumple.
+    Validate .txt/.TXT extension, allowed MIME, and size (when available).
+    Raise ValidationError if something doesn't comply.
     Reglas:
-      - Extensión obligatoria .txt/.TXT
-      - MIME permitido: text/plain; application/octet-stream se permite solo si la extensión es .txt
-      - Si content_type no está disponible, validamos por extensión
+      Rules:
+      - Required extension: .txt/.TXT
+      - Allowed MIME: text/plain; application/octet-stream is allowed only if the extension is .txt
+      - If content_type is not available, validate by extension
     """
     filename = file.filename or ""
     ext = Path(filename).suffix
     
-    # 1) Extensión obligatoria
+    # 1) Required extension
     if ext not in ALLOWED_EXT:
     #if not filename.endswith(tuple(ALLOWED_EXT)):
         raise ValidationError("Only .txt files are allowed.")
     
-    # 2) MIME tolerante (puede no venir seteado en algunos UploadFile)
-    ct = getattr(file, "content_type", None)  # podría no existir o ser None
+    # 2) Lenient MIME (may not be set on some UploadFile instances)
+    ct = getattr(file, "content_type", None)  # might not exist or be None
     if ct is not None:
         if ct not in ALLOWED_MIME:
-            # MIME no permitido
+            # Disallowed MIME
             raise ValidationError(f"Unsupported content-type: {ct}")
-        # application/octet-stream solo es válido si extensión es .txt (ya validada)
-        # si fuera otra ext (no llega aquí porque ya habríamos fallado arriba)
+       # application/octet-stream is valid only if extension is .txt (already validated above)
+        # if it were another extension, we wouldn't reach this point because we'd have failed above
    
    
    #if file.content_type not in ALLOWED_MIME:
         #raise ValidationError(f"Unsupported content-type: {file.content_type}")
 
-    # Intento acotar tamaño si el backend/proxy lo expone (no siempre disponible)
-    # FastAPI/Starlette no da el tamaño directo; límite real se debe configurar en servidor
-    # Aquí solo documentamos la intención.
-    # (Opcional) leer algunos bytes y reposicionar puntero si se fija un límite duro en app.
+    # Attempt to constrain size if the backend/proxy exposes it (not always available)
+    # FastAPI/Starlette does not provide size directly; a real limit should be enforced at the server.
+    # Here we just document the intention.
+    # (Optional) read some bytes and reset the pointer if you enforce a hard limit in the app.
