@@ -198,4 +198,5 @@ Security / Limits
 Credits
 
 Built by Iván Garcia Aguirre.
+
 Stack: FastAPI, Uvicorn, Starlette, Pydantic, Jinja2, Matplotlib, python-multipart, PyTest.
